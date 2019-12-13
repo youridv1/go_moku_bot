@@ -1,8 +1,10 @@
 import random
 import time
 import copy
+import gomoku
+import math
 
-class random_dummy_player:
+class mlgpro:
     """This class specifies a player that just does random moves.
     The use of this class is two-fold: 1) You can use it as a base random roll-out policy.
     2) it specifies the required methods that will be used by the competition to run
@@ -20,17 +22,48 @@ class random_dummy_player:
         self.black = black_
 
     def findSpotToExpand(self, nRoot):
-        if not valid_moves:
-            return nRoot
-        if #not fully expanded:
-            nChild # = a new child of nRoot
-            #add to nRoot's children
+        game = gomoku.gomoku_game(19, nRoot.board)
+        if game.check_win(nRoot.last_move):
+                return nRoot
+        if nRoot.valid_moves:
+            move = random.choice(nRoot.valid_moves)
+            game.move(move)
+            nRoot.valid_moves.remove(move)
+            color = not nRoot.color
+            nChild = Node(game.current_board(), nRoot.valid_moves, color, move, nRoot)
+            nRoot.children.append(nChild)
             return nChild
-        nChild # = child with heighest UCT
-        return findSpotToExpand(nChild)
+        nChild = nRoot.children[0]
+        for child in nRoot.children:
+            if child.UCT() > nChild.UCT():
+                nChild = child
+        return self.findSpotToExpand(nChild)
 
     def rollout(self, nLeaf):
-        
+        me = True
+        game = gomoku.gomoku_game(19, nLeaf.board)
+        lastMove = nLeaf.last_move
+        validMoves = nLeaf.valid_moves
+        while not game.check_win(lastMove) and validMoves:
+            move = random.choice(validMoves)
+            game.move(move)
+            validMoves.remove(move)
+            me = not me
+        if not validMoves:
+            return 0.5
+        return me
+    
+    def backupValue(self, n, val):
+        while n is not None:
+            n.N += 1
+            if some bullshit:
+                n.Q -= val
+            else:
+                n.Q += val
+            n = n.parent
+
+
+
     def move(self, board, last_move, valid_moves, max_time_to_move=1000):
         """This is the most important method: the agent will get:
         1) the current state of the board
@@ -39,9 +72,9 @@ class random_dummy_player:
         4) the maximimum time until the agent is required to make a move in milliseconds [diverging from this will lead to disqualification].
         """
         startTime = int(round(time.time() * 1000))
-        nRoot = last_move
+        nRoot = Node(board, valid_moves, self.black, last_move)
         while int(round(time.time() * 1000)) - startTime < max_time_to_move-100:
-            nLeaf = findSpotToExpand(nRoot, valid_moves)
+            nLeaf = self.findSpotToExpand(nRoot)
             val = rollout(nLeaf)
             backupValue(nLeaf, val)
         return random.choice(valid_moves)
@@ -50,20 +83,19 @@ class random_dummy_player:
         """Please return a string here that uniquely identifies your submission e.g., "name (student_id)" """
         return "Youri de Vor 17491751"
 
-Node Class:
-    Bord matrix
-    Valid moves list
-    children list
-    parent pointer
-    lastmove tuple 
-    color, wisselt per niveau
-    N visits
-    Q score
 
 class Node:
-    def __init__(self, board, valid_moves, parent = None, color, lastmove = ()):
+    def __init__(self, board, valid_moves, color = True, lastmove = (), parent = None):
         self.board = board
         self.valid_moves = valid_moves
+        self.children = []
         self.parent = parent
         self.color = color
-        self.lastmove
+        self.lastmove = lastmove
+        self.N = 0
+        self.Q = 0
+
+    def UCT(self, constant=1):
+        left = self.Q / self.N
+        right = constant*math.sqrt((2*math.log2(self.parent.N))/(self.N))
+        return left + right
