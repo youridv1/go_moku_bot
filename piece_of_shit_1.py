@@ -1,5 +1,6 @@
 import random
 import time
+import copy
 
 class random_dummy_player:
     """This class specifies a player that just does random moves.
@@ -30,7 +31,6 @@ class random_dummy_player:
 
     def rollout(self, nLeaf):
         
-
     def move(self, board, last_move, valid_moves, max_time_to_move=1000):
         """This is the most important method: the agent will get:
         1) the current state of the board
@@ -49,3 +49,21 @@ class random_dummy_player:
     def id(self):
         """Please return a string here that uniquely identifies your submission e.g., "name (student_id)" """
         return "Youri de Vor 17491751"
+
+Node Class:
+    Bord matrix
+    Valid moves list
+    children list
+    parent pointer
+    lastmove tuple 
+    color, wisselt per niveau
+    N visits
+    Q score
+
+class Node:
+    def __init__(self, board, valid_moves, parent = None, color, lastmove = ()):
+        self.board = board
+        self.valid_moves = valid_moves
+        self.parent = parent
+        self.color = color
+        self.lastmove
