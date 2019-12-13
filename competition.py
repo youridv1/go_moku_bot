@@ -1,6 +1,7 @@
 import gomoku
 import random_player
 import time
+import piece_of_shit_1 as ps
 
 class competition:
     """This class runs the competition between the submitted players.
@@ -84,11 +85,9 @@ class competition:
 # When the students submit a player file, they should be entered one by one.
 game = gomoku.gomoku_game()
 player = random_player.random_dummy_player()
-player2 = random_player.random_dummy_player()
-player3 = random_player.random_dummy_player()
+player2 = ps.mlgpro()
 comp = competition()
 comp.register_player(player)
 comp.register_player(player2)
-comp.register_player(player3)
 comp.play_competition()
 comp.print_scores()

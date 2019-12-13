@@ -23,12 +23,15 @@ class mlgpro:
 
     def findSpotToExpand(self, nRoot):
         game = gomoku.gomoku_game(19, nRoot.board)
-        if game.check_win(nRoot.last_move):
-                return nRoot
+        # print(len(nRoot.valid_moves))
+        if not nRoot.valid_moves:
+            return nRoot
         if nRoot.valid_moves:
+            # print(len(nRoot.valid_moves))
             move = random.choice(nRoot.valid_moves)
             game.move(move)
             nRoot.valid_moves.remove(move)
+            # print(len(nRoot.valid_moves))
             color = not nRoot.color
             nChild = Node(game.current_board(), nRoot.valid_moves, color, move, nRoot)
             nRoot.children.append(nChild)
@@ -40,26 +43,31 @@ class mlgpro:
         return self.findSpotToExpand(nChild)
 
     def rollout(self, nLeaf):
+        # print("rollout")
         me = True
         game = gomoku.gomoku_game(19, nLeaf.board)
-        lastMove = nLeaf.last_move
-        validMoves = nLeaf.valid_moves
+        lastMove = copy.deepcopy(nLeaf.last_move)
+        validMoves = copy.deepcopy(nLeaf.valid_moves)
         while not game.check_win(lastMove) and validMoves:
             move = random.choice(validMoves)
             game.move(move)
             validMoves.remove(move)
+            # print(len(nLeaf.valid_moves))
             me = not me
+            lastMove = move
         if not validMoves:
             return 0.5
-        return me
+        return not me
     
     def backupValue(self, n, val):
+        opp = False
         while n is not None:
             n.N += 1
-            if some bullshit:
+            if opp:
                 n.Q -= val
             else:
                 n.Q += val
+            opp = not opp
             n = n.parent
 
 
@@ -75,9 +83,15 @@ class mlgpro:
         nRoot = Node(board, valid_moves, self.black, last_move)
         while int(round(time.time() * 1000)) - startTime < max_time_to_move-100:
             nLeaf = self.findSpotToExpand(nRoot)
-            val = rollout(nLeaf)
-            backupValue(nLeaf, val)
-        return random.choice(valid_moves)
+            val = self.rollout(nLeaf)
+            self.backupValue(nLeaf, val)
+        bestChild = nRoot.children[0]
+        for child in nRoot.children:
+            if child.UCT() > bestChild.UCT():
+                bestChild = child
+        gomoku.prettyboard(board)
+        print('\n')
+        return bestChild.last_move
 
     def id(self):
         """Please return a string here that uniquely identifies your submission e.g., "name (student_id)" """
@@ -91,11 +105,11 @@ class Node:
         self.children = []
         self.parent = parent
         self.color = color
-        self.lastmove = lastmove
+        self.last_move = lastmove
         self.N = 0
         self.Q = 0
 
-    def UCT(self, constant=1):
+    def UCT(self, constant=0.7):
         left = self.Q / self.N
         right = constant*math.sqrt((2*math.log2(self.parent.N))/(self.N))
         return left + right
