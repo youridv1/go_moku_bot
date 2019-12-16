@@ -48,7 +48,7 @@ class mlgpro:
         game = gomoku.gomoku_game(19, nLeaf.board)
         lastMove = copy.deepcopy(nLeaf.last_move)
         validMoves = copy.deepcopy(nLeaf.valid_moves)
-        while not game.check_win(lastMove) and validMoves:
+        while (lastMove is None or (not game.check_win(lastMove))) and validMoves:
             move = random.choice(validMoves)
             game.move(move)
             validMoves.remove(move)
@@ -57,7 +57,7 @@ class mlgpro:
             lastMove = move
         if not validMoves:
             return 0.5
-        return not me
+        return me
     
     def backupValue(self, n, val):
         opp = False
