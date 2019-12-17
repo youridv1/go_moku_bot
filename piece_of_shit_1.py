@@ -91,8 +91,8 @@ class mlgpro:
         # for child in nRoot.children:
         #     if child.UCT() > bestChild.UCT():
         #         bestChild = child
-        gomoku.prettyboard(board)
-        print('\n')
+        # gomoku.prettyboard(board)
+        # print('\n')
         return bestChild.last_move
 
     def id(self):

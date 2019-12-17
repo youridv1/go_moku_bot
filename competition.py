@@ -19,7 +19,7 @@ class competition:
         This player needs to be in a separate file."""
         self.players.append(player_)
 
-    def play_competition(self, maxtime_per_move=100, tolerance=0.05):
+    def play_competition(self, maxtime_per_move=10, tolerance=0.05):
         """This method runs the actual competition between the registered players.
         Each player plays each other player twice: once with black and once with white."""
         self.results = []
