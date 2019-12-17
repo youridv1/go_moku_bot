@@ -28,7 +28,8 @@ class mlgpro:
             return nRoot
         if nRoot.valid_moves:
             # print(len(nRoot.valid_moves))
-            move = random.choice(nRoot.valid_moves)
+            # move = random.choice(nRoot.valid_moves)
+            move = nRoot.valid_moves[0]
             game.move(move)
             nRoot.valid_moves.remove(move)
             # print(len(nRoot.valid_moves))
@@ -81,14 +82,15 @@ class mlgpro:
         """
         startTime = int(round(time.time() * 1000))
         nRoot = Node(board, valid_moves, self.black, last_move)
-        while int(round(time.time() * 1000)) - startTime < max_time_to_move-100:
+        while int(round(time.time() * 1000)) - startTime < max_time_to_move-5:
             nLeaf = self.findSpotToExpand(nRoot)
             val = self.rollout(nLeaf)
             self.backupValue(nLeaf, val)
-        bestChild = nRoot.children[0]
-        for child in nRoot.children:
-            if child.UCT() > bestChild.UCT():
-                bestChild = child
+        # bestChild = nRoot.children[0]
+        bestChild = max(nRoot.children, key=lambda c : c.Q)
+        # for child in nRoot.children:
+        #     if child.UCT() > bestChild.UCT():
+        #         bestChild = child
         gomoku.prettyboard(board)
         print('\n')
         return bestChild.last_move
