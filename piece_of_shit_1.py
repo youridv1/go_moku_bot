@@ -23,16 +23,12 @@ class mlgpro:
 
     def findSpotToExpand(self, nRoot):
         game = gomoku.gomoku_game(19, nRoot.board)
-        # print(len(nRoot.valid_moves))
-        if not nRoot.valid_moves:
+        if not nRoot.valid_moves and not nRoot.children:
             return nRoot
         if nRoot.valid_moves:
-            # print(len(nRoot.valid_moves))
-            # move = random.choice(nRoot.valid_moves)
             move = nRoot.valid_moves[0]
             game.move(move)
             nRoot.valid_moves.remove(move)
-            # print(len(nRoot.valid_moves))
             color = not nRoot.color
             nChild = Node(game.current_board(), nRoot.valid_moves, color, move, nRoot)
             nRoot.children.append(nChild)
@@ -44,7 +40,6 @@ class mlgpro:
         return self.findSpotToExpand(nChild)
 
     def rollout(self, nLeaf):
-        # print("rollout")
         me = True
         game = gomoku.gomoku_game(19, nLeaf.board)
         lastMove = copy.deepcopy(nLeaf.last_move)
@@ -53,7 +48,6 @@ class mlgpro:
             move = random.choice(validMoves)
             game.move(move)
             validMoves.remove(move)
-            # print(len(nLeaf.valid_moves))
             me = not me
             lastMove = move
         if not validMoves:
@@ -86,13 +80,7 @@ class mlgpro:
             nLeaf = self.findSpotToExpand(nRoot)
             val = self.rollout(nLeaf)
             self.backupValue(nLeaf, val)
-        # bestChild = nRoot.children[0]
         bestChild = max(nRoot.children, key=lambda c : c.Q)
-        # for child in nRoot.children:
-        #     if child.UCT() > bestChild.UCT():
-        #         bestChild = child
-        # gomoku.prettyboard(board)
-        # print('\n')
         return bestChild.last_move
 
     def id(self):

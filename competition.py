@@ -19,7 +19,7 @@ class competition:
         This player needs to be in a separate file."""
         self.players.append(player_)
 
-    def play_competition(self, maxtime_per_move=10, tolerance=0.05):
+    def play_competition(self, maxtime_per_move=1000, tolerance=0.05):
         """This method runs the actual competition between the registered players.
         Each player plays each other player twice: once with black and once with white."""
         self.results = []
@@ -86,22 +86,8 @@ class competition:
 game = gomoku.gomoku_game()
 player = random_player.random_dummy_player()
 player2 = ps.mlgpro()
-player3 = ps.mlgpro()
-player4 = ps.mlgpro()
-player5 = ps.mlgpro()
-player6 = ps.mlgpro()
-player7 = ps.mlgpro()
-player8 = ps.mlgpro()
-player9 = ps.mlgpro()
 comp = competition()
 comp.register_player(player)
 comp.register_player(player2)
-comp.register_player(player3)
-comp.register_player(player4)
-comp.register_player(player5)
-comp.register_player(player6)
-comp.register_player(player7)
-comp.register_player(player8)
-comp.register_player(player9)
 comp.play_competition()
 comp.print_scores()
